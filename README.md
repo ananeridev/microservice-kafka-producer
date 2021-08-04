@@ -12,7 +12,7 @@
 
 ### Sending a message
 
-> Tip: import these commanda on Postman make your life easy
+> Tip: import these commands on Postman make your life easy
 
 ```
 curl -i \
