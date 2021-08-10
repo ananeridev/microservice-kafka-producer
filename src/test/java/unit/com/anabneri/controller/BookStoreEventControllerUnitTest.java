@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(BookStoreEventController.class)
 @AutoConfigureMockMvc
-public class BookStoreEventControllerUnitTest {
+public class BookStoreEventControllerUnitTest extends BaseTest {
 
     // Injetar o bean
     @Autowired
@@ -38,27 +38,13 @@ public class BookStoreEventControllerUnitTest {
     @Test
     void should_post_book_store_event() throws Exception {
 
-        // given
-        Book book = Book.builder()
-                .bookId(111)
-                .bookName("A culpa e das estrelas")
-                .bookAuthor("John Green")
-                .build();
+        createANewBookWithEvent();
 
-        BookStoreEvent bookStoreEvent = BookStoreEvent.builder()
-                .bookStoreEventId(null)
-                .book(book)
-                .build();
-
-     String json =  objectMapper.writeValueAsString(bookStoreEvent);
-
-     // usando o doNothing() eu tenho erro de instanciacao
-//     doNothing().when(bookStoreEventProducer).senBookStoreEvent_Approach2(isA(BookStoreEvent.class))
+     String json =  objectMapper.writeValueAsString(createANewBookWithEvent());
 
         when(bookStoreEventProducer.senBookStoreEvent_Approach2(isA(BookStoreEvent.class))).thenReturn(null);
 
 
-        //when - chamar o endpoint
         mockMvc.perform(post("/v1/bookstore-event")
         .content(json)
         .contentType(MediaType.APPLICATION_JSON))
@@ -66,36 +52,36 @@ public class BookStoreEventControllerUnitTest {
     }
 
 
-    @Test
-    void should_not_post_book_store_event_when_status_code_was_4xx() throws Exception {
-
-        // given
-        Book book = Book.builder()
-                .bookId(null)
-                .bookName("A culpa e das estrelas")
-                .bookAuthor(null)
-                .build();
-
-
-        BookStoreEvent bookStoreEvent = BookStoreEvent.builder()
-                .bookStoreEventId(null)
-                .book(book)
-                .build();
-
-        String json =  objectMapper.writeValueAsString(bookStoreEvent);
-
-        // usando o doNothing() eu tenho erro de instanciacao
-//     doNothing().when(bookStoreEventProducer).senBookStoreEvent_Approach2(isA(BookStoreEvent.class))
-
-        //when - chamar o endpoint
-        when(bookStoreEventProducer.senBookStoreEvent_Approach2(isA(BookStoreEvent.class))).thenReturn(null);
-
-        // expected
-        String expectedErrorMessage = "book.bookAuthor - must not be blank , book.bookId - must not be null";
-        mockMvc.perform(post("/v1/bookstore-event")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError())
-        .andExpect(content().string(expectedErrorMessage));
-    }
+//    @Test
+//    void should_not_post_book_store_event_when_status_code_was_4xx() throws Exception {
+//
+//        // given
+//        Book book = Book.builder()
+//                .bookId(null)
+//                .bookName("A culpa e das estrelas")
+//                .bookAuthor(null)
+//                .build();
+//
+//
+//        BookStoreEvent bookStoreEvent = BookStoreEvent.builder()
+//                .bookStoreEventId(null)
+//                .book(book)
+//                .build();
+//
+//        String json =  objectMapper.writeValueAsString(bookStoreEvent);
+//
+//        // usando o doNothing() eu tenho erro de instanciacao
+////     doNothing().when(bookStoreEventProducer).senBookStoreEvent_Approach2(isA(BookStoreEvent.class))
+//
+//        //when - chamar o endpoint
+//        when(bookStoreEventProducer.senBookStoreEvent_Approach2(isA(BookStoreEvent.class))).thenReturn(null);
+//
+//        // expected
+//        String expectedErrorMessage = "book.bookAuthor - must not be blank , book.bookId - must not be null";
+//        mockMvc.perform(post("/v1/bookstore-event")
+//                .content(json)
+//                .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().is4xxClientError())
+//        .andExpect(content().string(expectedErrorMessage));
+//    }
 }
