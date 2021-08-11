@@ -24,8 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EmbeddedKafka(topics = {"bookstore-events"}, partitions = 3)
-
-// sobrescrevo propriedades do kafka brokers e dos servers
 @TestPropertySource(properties = {"spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "spring.kafka.admin.properties.bootstrap.servers=${spring.embedded.kafka.brokers}"})
 public class BookStoreEventControllerIntgTest {
@@ -52,8 +50,6 @@ public class BookStoreEventControllerIntgTest {
 
     @Test
     void should_post_book_store_event() throws InterruptedException {
-
-        //given
         Book book = Book.builder()
                 .bookId(111)
                 .bookName("A culpa e das estrelas")
@@ -69,13 +65,9 @@ public class BookStoreEventControllerIntgTest {
         headers.set("content-type", MediaType.APPLICATION_JSON.toString());
         HttpEntity<BookStoreEvent> request = new HttpEntity<>(bookStoreEvent);
 
-        //when
       ResponseEntity<BookStoreEvent> responseEntity =  restTemplate.exchange("/v1/bookstore-event", HttpMethod.POST, request, BookStoreEvent.class);
 
-        //then
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-
-        // mostrar que sem os servidores os testes integrados nao rodam
 
         ConsumerRecord<Integer, String> consumerRecord = KafkaTestUtils.getSingleRecord(consumer, "bookstore-events");
         Thread.sleep(3000);
@@ -90,8 +82,6 @@ public class BookStoreEventControllerIntgTest {
     @Test
     @Timeout(6)
     void should_put_book_store_event() throws InterruptedException {
-
-        //given
         Book book = Book.builder()
                 .bookId(426)
                 .bookName("A culpa e das estrelas")
@@ -107,16 +97,11 @@ public class BookStoreEventControllerIntgTest {
         headers.set("content-type", MediaType.APPLICATION_JSON.toString());
         HttpEntity<BookStoreEvent> request = new HttpEntity<>(bookStoreEvent);
 
-        //when
         ResponseEntity<BookStoreEvent> responseEntity =  restTemplate.exchange("/v1/bookstore-event", HttpMethod.PUT, request, BookStoreEvent.class);
 
-        //then
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-        // mostrar que sem os servidores os testes integrados nao rodam
-
         ConsumerRecord<Integer, String> consumerRecord = KafkaTestUtils.getSingleRecord(consumer, "bookstore-events");
-        //Thread.sleep(3000);
         String expectedRecord = "{\"bookStoreEventId\":222,\"bookStoreEventType\":\"UPDATE\",\"book\":{\"bookId\":426,\"bookName\":\"A culpa e das estrelas\",\"bookAuthor\":\"John Green\"}}";
         String value = consumerRecord.value();
         assertEquals(expectedRecord, value);
