@@ -1,5 +1,5 @@
 
-## A producer kafka using TDD 
+## A Kafka producer using TDD 
 
 
 ### The requirements of these systems are:
